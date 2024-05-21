@@ -376,6 +376,7 @@ def update_which_IODR(IODR1_button, IODR2_button, IODR3_button):  # load data on
     else:
         device_num = 1  # default IODR #2
 
+    print(f"Device {device_num+1} selected, downloading OD data...")
     # gets the full OD data frame with 8000 points
     od_df_original_full = get_OD_dataframe(device_num, chIDs, readAPIkeys)
     # culls the data to only take 1/10th of the data before the most recent 2 hours
@@ -471,8 +472,9 @@ def update_table_df(update_button, clear_button, device_num, tables_list, od_df_
         for i in range(8):
             offset_value = stored_table_df['offset'].iloc[i]    # get offset values
             # get ln data into a dataframe and make a json for storage
-            lndf = format_ln_data(od_df_updated, i, offset_value=offset_value).to_json(date_format='iso', orient='table')
-            ln_dataframes.append(lndf)
+            lndf = format_ln_data(od_df_updated, i, offset_value=offset_value)
+            lndf_json = lndf.to_json(date_format='iso', orient='table')
+            ln_dataframes.append(lndf_json)
 
         # get the time estimates for when each tube hits target and the r^2 vals
         estimates, r_vals = estimate_times(ln_dataframes, targets)

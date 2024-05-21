@@ -64,10 +64,12 @@ def get_OD_dataframe(device, chIDs, readAPIkeys):
     df4 = df3.set_index('time')
 
 
-
+    # flag bad data as np.nan
+    df5 = df4.apply(lambda col: pd.to_numeric(col, errors = 'coerce'))
 
     # print("df8 ", df8)
-    full_dataframe = df4
+    full_dataframe = df5
+      
 
     return full_dataframe
 
@@ -210,12 +212,18 @@ def format_ln_data(dataframe, tube_num, offset_value=0):
 
     # rename tube column to OD
     df2.rename({tube_name: 'OD'}, axis=1, inplace=True)
-    df2['OD'] = df2['OD'] + offset_value
+    
+    # get rid of non-numeric values
+    df3 = pd.to_numeric(df2.iloc[:,0], errors = 'coerce').to_frame('OD')
+    df3 = df3.replace(np.inf, np.nan).dropna()
+    
+    df3['OD'] = df3['OD'] + offset_value
     # print("OD after blank val sub", df2['OD'])
     # calculate the natural log
-    df2['lnOD'] = np.log(df2['OD'])
+    df3['lnOD'] = np.log(df3['OD'])
     # print(df2['lnOD'])
-
-    return df2
+    print(df3[:5])
+    
+    return df3
 
 
